@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sonata project.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -17,19 +17,19 @@ use Sonata\MediaBundle\Model\MediaInterface;
 interface ResizerInterface
 {
     /**
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     * @param \Gaufrette\File $in
-     * @param \Gaufrette\File $out
-     * @param string $format
-     * @param array $settings
-     * @return void
+     * @param MediaInterface $media
+     * @param File           $in
+     * @param File           $out
+     * @param string         $format
+     * @param array          $settings
      */
-    function resize(MediaInterface $media, File $in, File $out, $format, array $settings);
+    public function resize(MediaInterface $media, File $in, File $out, $format, array $settings);
 
     /**
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     * @param array $settings
-     * @return \Imagine\Image\Box
+     * @param MediaInterface $media
+     * @param array          $settings
+     *
+     * @return Box
      */
-    function getBox(MediaInterface $media, array $settings);
+    public function getBox(MediaInterface $media, array $settings);
 }

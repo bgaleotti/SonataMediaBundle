@@ -10,17 +10,16 @@
     </parameters>
 
     <services>
-        <service id="sonata.media.document_manager" alias="doctrine.odm.mongodb.default_document_manager" />
+        <service id="sonata.media.document_manager" alias="doctrine_mongodb.odm.document_manager" />
 
         <service id="sonata.media.manager.media" class="%sonata.media.manager.media.class%">
-            <argument type="service" id="sonata.media.pool" />
-            <argument type="service" id="sonata.media.document_manager" />
             <argument>%sonata.media.media.class%</argument>
+            <argument type="service" id="doctrine_mongodb" />
         </service>
 
         <service id="sonata.media.manager.gallery" class="%sonata.media.manager.gallery.class%">
-            <argument type="service" id="sonata.media.document_manager" />
             <argument>%sonata.media.gallery.class%</argument>
+            <argument type="service" id="doctrine_mongodb" />
         </service>
 
         <!-- Path generator servive -->
@@ -29,7 +28,7 @@
         </service>
 
         <service id="sonata.media.doctrine.event_subscriber" class="Sonata\MediaBundle\Listener\ODM\MediaEventSubscriber">
-            <tag name="doctrine.common.event_subscriber" />
+            <tag name="doctrine_mongodb.odm.event_subscriber" />
 
             <argument type="service" id="service_container" />
         </service>

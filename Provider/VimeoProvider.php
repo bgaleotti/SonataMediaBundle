@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sonata project.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -11,6 +11,7 @@
 
 namespace Sonata\MediaBundle\Provider;
 
+use Sonata\CoreBundle\Model\Metadata;
 use Sonata\MediaBundle\Model\MediaInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -73,14 +74,22 @@ class VimeoProvider extends BaseVideoProvider
     /**
      * {@inheritdoc}
      */
+    public function getProviderMetadata()
+    {
+        return new Metadata($this->getName(), $this->getName().'.description', false, 'SonataMediaBundle', array('class' => 'fa fa-vimeo-square'));
+    }
+
+    /**
+     * @param MediaInterface $media
+     */
     protected function fixBinaryContent(MediaInterface $media)
     {
         if (!$media->getBinaryContent()) {
             return;
         }
 
-        if (preg_match("/vimeo\.com\/(\d+)/", $media->getBinaryContent(), $matches)) {
-            $media->setBinaryContent($matches[1]);
+        if (preg_match("/vimeo\.com\/(video\/|)(\d+)/", $media->getBinaryContent(), $matches)) {
+            $media->setBinaryContent($matches[2]);
         }
     }
 
@@ -138,8 +147,8 @@ class VimeoProvider extends BaseVideoProvider
     /**
      * {@inheritdoc}
      */
-    public function getDownloadResponse(MediaInterface $media, $format, $mode = null)
+    public function getDownloadResponse(MediaInterface $media, $format, $mode, array $headers = array())
     {
-        return new RedirectResponse(sprintf('http://vimeo.com/%s', $media->getProviderReference()));
+        return new RedirectResponse(sprintf('http://vimeo.com/%s', $media->getProviderReference()), 302, $headers);
     }
 }

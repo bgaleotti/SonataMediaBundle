@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sonata project.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -11,21 +11,17 @@
 
 namespace Sonata\MediaBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- *
- *
  * @author Thomas Rabaix <thomas.rabaix@sonata-project.org>
  */
 class AddProviderCompilerPass implements CompilerPassInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
@@ -38,17 +34,17 @@ class AddProviderCompilerPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds('sonata.media.provider') as $id => $attributes) {
             $container->getDefinition($id)->addMethodCall('addFormat', array('admin', array(
-                'quality'       => 80,
-                'width'         => 100,
+                'quality'       => 90,
+                'width'         => 200,
                 'format'        => 'jpg',
                 'height'        => false,
-                'constraint'    => true
+                'constraint'    => true,
             )));
         }
     }
 
     /**
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param ContainerBuilder $container
      *
      * @return array
      */
@@ -76,7 +72,7 @@ class AddProviderCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param ContainerBuilder $container
      */
     public function attachProviders(ContainerBuilder $container)
     {
@@ -87,13 +83,13 @@ class AddProviderCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @param array $settings
+     * @param ContainerBuilder $container
+     * @param array            $settings
      */
     public function attachArguments(ContainerBuilder $container, array $settings)
     {
         foreach ($container->findTaggedServiceIds('sonata.media.provider') as $id => $attributes) {
-            foreach($settings['providers'] as $name => $config) {
+            foreach ($settings['providers'] as $name => $config) {
                 if ($config['service'] == $id) {
                     $definition = $container->getDefinition($id);
 
@@ -113,15 +109,15 @@ class AddProviderCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * Define the default settings to the config array
+     * Define the default settings to the config array.
      *
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @param array $settings
+     * @param ContainerBuilder $container
+     * @param array            $settings
      */
     public function applyFormats(ContainerBuilder $container, array $settings)
     {
         foreach ($settings['contexts'] as $name => $context) {
-            // add the differents related formats
+            // add the different related formats
             foreach ($context['providers'] as $id) {
                 $definition = $container->getDefinition($id);
 

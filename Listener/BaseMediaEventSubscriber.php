@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sonata project.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -11,19 +11,21 @@
 
 namespace Sonata\MediaBundle\Listener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\EventArgs;
-
+use Doctrine\Common\EventSubscriber;
 use Sonata\MediaBundle\Model\MediaInterface;
 use Sonata\MediaBundle\Provider\Pool;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class BaseMediaEventSubscriber implements EventSubscriber
 {
-    private $container;
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
     /**
-     * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+     * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
     {
@@ -31,7 +33,7 @@ abstract class BaseMediaEventSubscriber implements EventSubscriber
     }
 
     /**
-     * @return \Sonata\MediaBundle\Provider\Pool
+     * @return Pool
      */
     public function getPool()
     {
@@ -39,60 +41,106 @@ abstract class BaseMediaEventSubscriber implements EventSubscriber
     }
 
     /**
-     * @abstract
-     *
-     * @param \Doctrine\Common\EventArgs $args
-     *
-     * @return void
+     * @param EventArgs $args
      */
     abstract protected function recomputeSingleEntityChangeSet(EventArgs $args);
 
     /**
-     * @param \Doctrine\ORM\Event\LifecycleEventArgs $args
+     * @param EventArgs $args
      *
-     * @return \Sonata\MediaBundle\Provider\MediaProviderInterface
+     * @return \Sonata\MediaBundle\Model\MediaInterface
      */
-    abstract protected function getProvider(EventArgs $args); 
+    abstract protected function getMedia(EventArgs $args);
 
     /**
-     * @param \Doctrine\Common\EventArgs $args
+     * @param EventArgs $args
      *
-     * @return void
+     * @return MediaProviderInterface
      */
-    abstract public function postUpdate(EventArgs $args);
+    protected function getProvider(EventArgs $args)
+    {
+        $media = $this->getMedia($args);
+
+        if (!$media instanceof MediaInterface) {
+            return;
+        }
+
+        return $this->getPool()->getProvider($media->getProviderName());
+    }
 
     /**
-     * @param \Doctrine\Common\EventArgs $args
-     *
-     * @return void
+     * @param EventArgs $args
      */
-    abstract public function postRemove(EventArgs $args);
+    public function postUpdate(EventArgs $args)
+    {
+        if (!($provider = $this->getProvider($args))) {
+            return;
+        }
+
+        $provider->postUpdate($this->getMedia($args));
+    }
 
     /**
-     * @param \Doctrine\Common\EventArgs $args
-     *
-     * @return void
+     * @param EventArgs $args
      */
-    abstract public function postPersist(EventArgs $args);
+    public function postRemove(EventArgs $args)
+    {
+        if (!($provider = $this->getProvider($args))) {
+            return;
+        }
+
+        $provider->postRemove($this->getMedia($args));
+    }
 
     /**
-     * @param \Doctrine\Common\EventArgs $args
-     *
-     * @return void
+     * @param EventArgs $args
      */
-    abstract public function preUpdate(EventArgs $args);
+    public function postPersist(EventArgs $args)
+    {
+        if (!($provider = $this->getProvider($args))) {
+            return;
+        }
+
+        $provider->postPersist($this->getMedia($args));
+    }
 
     /**
-     * @param \Doctrine\Common\EventArgs $args
-     *
-     * @return void
+     * @param EventArgs $args
      */
-    abstract public function preRemove(EventArgs $args);
+    public function preUpdate(EventArgs $args)
+    {
+        if (!($provider = $this->getProvider($args))) {
+            return;
+        }
+
+        $provider->transform($this->getMedia($args));
+        $provider->preUpdate($this->getMedia($args));
+
+        $this->recomputeSingleEntityChangeSet($args);
+    }
 
     /**
-     * @param \Doctrine\Common\EventArgs $args
-     *
-     * @return void
+     * @param EventArgs $args
      */
-    abstract public function prePersist(EventArgs $args);
+    public function preRemove(EventArgs $args)
+    {
+        if (!($provider = $this->getProvider($args))) {
+            return;
+        }
+
+        $provider->preRemove($this->getMedia($args));
+    }
+
+    /**
+     * @param EventArgs $args
+     */
+    public function prePersist(EventArgs $args)
+    {
+        if (!($provider = $this->getProvider($args))) {
+            return;
+        }
+
+        $provider->transform($this->getMedia($args));
+        $provider->prePersist($this->getMedia($args));
+    }
 }

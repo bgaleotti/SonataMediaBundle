@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sonata package.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -11,19 +11,20 @@
 
 namespace Sonata\MediaBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Sonata\MediaBundle\Model\MediaInterface;
 use Sonata\MediaBundle\Provider\MediaProviderInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class MediaController extends Controller
 {
     /**
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
+     * @param MediaInterface $media
      *
-     * @return \Sonata\MediaBundle\Provider\MediaProviderInterface
+     * @return MediaProviderInterface
      */
     public function getProvider(MediaInterface $media)
     {
@@ -33,47 +34,20 @@ class MediaController extends Controller
     /**
      * @param string $id
      *
-     * @return \Sonata\MediaBundle\Model\MediaInterface
+     * @return MediaInterface
      */
     public function getMedia($id)
     {
-        return $this->get('sonata.media.manager.media')->findOneBy(array('id' => $id));
+        return $this->get('sonata.media.manager.media')->find($id);
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      *
      * @param string $id
      * @param string $format
      *
-     * @return \Symfony\Bundle\FrameworkBundle\Controller\Response
-     */
-    public function viewAction($id, $format = 'reference')
-    {
-        $media = $this->getMedia($id);
-
-        if (!$media) {
-            throw new NotFoundHttpException(sprintf('unable to find the media with the id : %s', $id));
-        }
-
-        if (!$this->get('sonata.media.pool')->getDownloadSecurity($media)->isGranted($media, $this->getRequest())) {
-            throw new AccessDeniedException();
-        }
-
-        return $this->render('SonataMediaBundle:Media:view.html.twig', array(
-            'media'     => $media,
-            'formats'   => $this->get('sonata.media.pool')->getFormatNamesByContext($media->getContext()),
-            'format'    => $format
-        ));
-    }
-
-    /**
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     *
-     * @param string $id
-     * @param string $format
-     *
-     * @return \Symfony\Bundle\FrameworkBundle\Controller\Response
+     * @return Response
      */
     public function downloadAction($id, $format = 'reference')
     {
@@ -89,17 +63,47 @@ class MediaController extends Controller
 
         $response = $this->getProvider($media)->getDownloadResponse($media, $format, $this->get('sonata.media.pool')->getDownloadMode($media));
 
+        if ($response instanceof BinaryFileResponse) {
+            $response->prepare($this->get('request'));
+        }
+
         return $response;
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     *
+     * @param string $id
+     * @param string $format
+     *
+     * @return Response
+     */
+    public function viewAction($id, $format = 'reference')
+    {
+        $media = $this->getMedia($id);
+
+        if (!$media) {
+            throw new NotFoundHttpException(sprintf('unable to find the media with the id : %s', $id));
+        }
+
+        if (!$this->get('sonata.media.pool')->getDownloadSecurity($media)->isGranted($media, $this->getRequest())) {
+            throw new AccessDeniedException();
+        }
+
+        return $this->render('SonataMediaBundle:Media:view.html.twig', array(
+                'media'     => $media,
+                'formats'   => $this->get('sonata.media.pool')->getFormatNamesByContext($media->getContext()),
+                'format'    => $format,
+            ));
     }
 
     /**
      * This action applies a given filter to a given image,
      * optionally saves the image and
-     * outputs it to the browser at the same time
+     * outputs it to the browser at the same time.
      *
-     * @param Request $request
-     * @param string  $path
-     * @param string  $filter
+     * @param string $path
+     * @param string $filter
      *
      * @return Response
      */
@@ -124,7 +128,7 @@ class MediaController extends Controller
         $provider = $this->getProvider($media);
         $file     = $provider->getReferenceFile($media);
 
-        // load the file content from the abstrated file system
+        // load the file content from the abstracted file system
         $tmpFile = sprintf('%s.%s', tempnam(sys_get_temp_dir(), 'sonata_media_liip_imagine'), $media->getExtension());
         file_put_contents($tmpFile, $file->getContent());
 

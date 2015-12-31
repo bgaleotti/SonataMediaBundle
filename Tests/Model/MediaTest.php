@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sonata package.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -24,9 +24,9 @@ class MediaTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('value', $metadata['name'], 'the string value should be returned');
 
         $cropData = array(
-            'x' => 10,
-            'y' => 20,
-            'width' => 500,
+            'x'      => 10,
+            'y'      => 20,
+            'width'  => 500,
             'height' => 500,
         );
         $media->setMetadataValue('crop', $cropData);
@@ -65,6 +65,7 @@ class MediaTest extends \PHPUnit_Framework_TestCase
         $rc = new \ReflectionClass('Sonata\MediaBundle\Model\Media');
         $property = $rc->getProperty($propertyName);
         $property->setAccessible(true);
+
         return $property;
     }
 
@@ -74,7 +75,7 @@ class MediaTest extends \PHPUnit_Framework_TestCase
         $media->expects($this->any())
             ->method('getId')
             ->will($this->returnValue($id));
+
         return $media;
     }
 }
- 

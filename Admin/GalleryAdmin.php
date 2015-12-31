@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sonata package.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -12,21 +12,23 @@
 namespace Sonata\MediaBundle\Admin;
 
 use Sonata\AdminBundle\Admin\Admin;
-use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
+use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\MediaBundle\Provider\Pool;
-use Sonata\AdminBundle\Validator\ErrorElement;
 
 class GalleryAdmin extends Admin
 {
+    /**
+     * @var Pool
+     */
     protected $pool;
 
     /**
-     * @param string                            $code
-     * @param string                            $class
-     * @param string                            $baseControllerName
-     * @param \Sonata\MediaBundle\Provider\Pool $pool
+     * @param string $code
+     * @param string $class
+     * @param string $baseControllerName
+     * @param Pool   $pool
      */
     public function __construct($code, $class, $baseControllerName, Pool $pool)
     {
@@ -40,6 +42,12 @@ class GalleryAdmin extends Admin
      */
     protected function configureFormFields(FormMapper $formMapper)
     {
+        // define group zoning
+        $formMapper
+            ->with($this->trans('Gallery'), array('class' => 'col-md-9'))->end()
+            ->with($this->trans('Options'), array('class' => 'col-md-3'))->end()
+        ;
+
         $context = $this->getPersistentParameter('context');
 
         if (!$context) {
@@ -47,28 +55,37 @@ class GalleryAdmin extends Admin
         }
 
         $formats = array();
-        foreach((array)$this->pool->getFormatNamesByContext($context) as $name => $options) {
+        foreach ((array) $this->pool->getFormatNamesByContext($context) as $name => $options) {
             $formats[$name] = $name;
         }
 
         $contexts = array();
-        foreach((array)$this->pool->getContexts() as $context => $format) {
-            $contexts[$context] = $context;
+        foreach ((array) $this->pool->getContexts() as $contextItem => $format) {
+            $contexts[$contextItem] = $contextItem;
         }
 
         $formMapper
-            ->add('context', 'choice', array('choices' => $contexts))
-            ->add('enabled', null, array('required' => false))
-            ->add('name')
-            ->add('defaultFormat', 'choice', array('choices' => $formats))
-            ->add('galleryHasMedias', 'sonata_type_collection', array(
-                'by_reference' => false
-            ), array(
-                'edit' => 'inline',
-                'inline' => 'table',
-                'sortable'  => 'position',
-                'link_parameters' => array('context' => $context)
-            ))
+            ->with('Options')
+                ->add('context', 'choice', array(
+                    'choices'            => $contexts,
+                    'translation_domain' => 'SonataMediaBundle',
+                ))
+                ->add('enabled', null, array('required' => false))
+                ->add('name')
+                ->add('defaultFormat', 'choice', array('choices' => $formats))
+            ->end()
+            ->with('Gallery')
+                ->add('galleryHasMedias', 'sonata_type_collection', array(
+                        'cascade_validation' => true,
+                    ), array(
+                        'edit'              => 'inline',
+                        'inline'            => 'table',
+                        'sortable'          => 'position',
+                        'link_parameters'   => array('context' => $context),
+                        'admin_code'        => 'sonata.media.admin.gallery_has_media',
+                    )
+                )
+            ->end()
         ;
     }
 
@@ -78,25 +95,11 @@ class GalleryAdmin extends Admin
     protected function configureListFields(ListMapper $listMapper)
     {
         $listMapper
-            ->add('enabled')
             ->addIdentifier('name')
-            ->add('context')
-            ->add('defaultFormat')
+            ->add('enabled', 'boolean', array('editable' => true))
+            ->add('context', 'trans', array('catalogue' => 'SonataMediaBundle'))
+            ->add('defaultFormat', 'trans', array('catalogue' => 'SonataMediaBundle'))
         ;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ErrorElement $errorElement, $gallery)
-    {
-        $formats = $this->pool->getFormatNamesByContext($gallery->getContext());
-
-        if (!array_key_exists($gallery->getDefaultFormat(), $formats)) {
-            $errorElement->with('defaultFormat')
-                ->addViolation('invalid format')
-            ->end();
-        }
     }
 
     /**
@@ -119,6 +122,18 @@ class GalleryAdmin extends Admin
         $parameters = $this->getPersistentParameters();
 
         $gallery->setContext($parameters['context']);
+
+        // fix weird bug with setter object not being call
+        $gallery->setGalleryHasMedias($gallery->getGalleryHasMedias());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function preUpdate($gallery)
+    {
+        // fix weird bug with setter object not being call
+        $gallery->setGalleryHasMedias($gallery->getGalleryHasMedias());
     }
 
     /**
@@ -126,13 +141,15 @@ class GalleryAdmin extends Admin
      */
     public function getPersistentParameters()
     {
+        $parameters = parent::getPersistentParameters();
+
         if (!$this->hasRequest()) {
-            return array();
+            return $parameters;
         }
 
-        return array(
+        return array_merge($parameters, array(
             'context'  => $this->getRequest()->get('context', $this->pool->getDefaultContext()),
-        );
+        ));
     }
 
     /**

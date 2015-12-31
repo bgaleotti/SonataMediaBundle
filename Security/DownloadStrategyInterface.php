@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sonata project.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -17,19 +17,15 @@ use Symfony\Component\HttpFoundation\Request;
 interface DownloadStrategyInterface
 {
     /**
-     * @abstract
-     *
-     * @param \Sonata\MediaBundle\Model\MediaInterface  $media
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param MediaInterface $media
+     * @param Request        $request
      *
      * @return bool
      */
-    function isGranted(MediaInterface $media, Request $request);
+    public function isGranted(MediaInterface $media, Request $request);
 
     /**
-     * @abstract
-     *
      * @return string
      */
-    function getDescription();
+    public function getDescription();
 }

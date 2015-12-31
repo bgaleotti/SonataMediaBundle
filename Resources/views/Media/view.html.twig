@@ -9,6 +9,14 @@ file that was distributed with this source code.
 
 #}
 
+{% sonata_template_box 'This is the media view template. Feel free to override it.' %}
+
+{% block sonata_page_breadcrumb %}
+    <div class="row-fluid clearfix">
+        {{ sonata_block_render_event('breadcrumb', { 'context': 'media_view', 'media': media, 'current_uri': app.request.requestUri }) }}
+    </div>
+{% endblock %}
+
 <h1>{{ media.name }}</h1>
 
 <div>
@@ -28,9 +36,9 @@ file that was distributed with this source code.
 
 <h2>Formats</h2>
 <ul>
-    <li><a href="{{ url('sonata_media_view', { 'id' : media.id, 'format' : 'reference'}) }}">reference</a></li>
+    <li><a href="{{ url('sonata_media_view', { 'id' : media|sonata_urlsafeid , 'format' : 'reference'}) }}">reference</a></li>
 
     {% for name, format in formats %}
-        <li><a href="{{ url('sonata_media_view', { 'id' : media.id, 'format' : name}) }}">{{ name }}</a></li>
+        <li><a href="{{ url('sonata_media_view', { 'id' : media|sonata_urlsafeid , 'format' : name}) }}">{{ name }}</a></li>
     {% endfor %}
 </ul>

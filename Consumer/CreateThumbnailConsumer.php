@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sonata project.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -11,29 +11,37 @@
 
 namespace Sonata\MediaBundle\Consumer;
 
-use Sonata\NotificationBundle\Consumer\ConsumerInterface;
-use Sonata\NotificationBundle\Consumer\ConsumerEvent;
-use Sonata\MediaBundle\Model\MediaManagerInterface;
+use Sonata\CoreBundle\Model\ManagerInterface;
 use Sonata\MediaBundle\Provider\Pool;
 use Sonata\MediaBundle\Thumbnail\ThumbnailInterface;
+use Sonata\NotificationBundle\Consumer\ConsumerEvent;
+use Sonata\NotificationBundle\Consumer\ConsumerInterface;
 use Sonata\NotificationBundle\Exception\HandlingException;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CreateThumbnailConsumer implements ConsumerInterface
 {
+    /**
+     * @var ManagerInterface
+     */
     protected $mediaManager;
 
+    /**
+     * @var Pool
+     */
     protected $pool;
 
+    /**
+     * @var ContainerInterface
+     */
     protected $container;
 
     /**
-     * @param \Sonata\MediaBundle\Model\MediaManagerInterface           $mediaManager
-     * @param \Sonata\MediaBundle\Provider\Pool                         $pool
-     * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+     * @param ManagerInterface   $mediaManager
+     * @param Pool               $pool
+     * @param ContainerInterface $container
      */
-    public function __construct(MediaManagerInterface $mediaManager, Pool $pool, ContainerInterface $container)
+    public function __construct(ManagerInterface $mediaManager, Pool $pool, ContainerInterface $container)
     {
         $this->mediaManager = $mediaManager;
         $this->pool         = $pool;
@@ -41,22 +49,20 @@ class CreateThumbnailConsumer implements ConsumerInterface
     }
 
     /**
-     * @param \Sonata\NotificationBundle\Consumer\ConsumerEvent $event
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function process(ConsumerEvent $event)
     {
         $media = $this->mediaManager->findOneBy(array(
-            'id' => $event->getMessage()->getValue('mediaId')
+            'id' => $event->getMessage()->getValue('mediaId'),
         ));
-
-        // solve race condition between message queue and database transaction
-        $media->setProviderReference($event->getMessage()->getValue('providerReference'));
 
         if (!$media) {
             throw new HandlingException(sprintf('Media not found - id: %s', $event->getMessage()->getValue('mediaId')));
         }
+
+        // solve race condition between message queue and database transaction
+        $media->setProviderReference($event->getMessage()->getValue('providerReference'));
 
         try {
             $this->getThumbnail($event)->generate($this->pool->getProvider($media->getProviderName()), $media);
@@ -66,9 +72,9 @@ class CreateThumbnailConsumer implements ConsumerInterface
     }
 
     /**
-     * @param \Sonata\NotificationBundle\Consumer\ConsumerEvent $event
+     * @param ConsumerEvent $event
      *
-     * @return \Sonata\MediaBundle\Thumbnail\ThumbnailInterface
+     * @return ThumbnailInterface
      */
     protected function getThumbnail(ConsumerEvent $event)
     {

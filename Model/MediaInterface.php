@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sonata project.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -11,6 +11,7 @@
 
 namespace Sonata\MediaBundle\Model;
 
+use Imagine\Image\Box;
 
 interface MediaInterface
 {
@@ -20,350 +21,363 @@ interface MediaInterface
     const STATUS_ERROR       = 4;
     const STATUS_ENCODING    = 5;
 
+    const MISSING_BINARY_REFERENCE = 'missing_binary_content';
+
     /**
      * @param mixed $binaryContent
      */
-    function setBinaryContent($binaryContent);
+    public function setBinaryContent($binaryContent);
 
     /**
      * @return mixed
      */
-    function getBinaryContent();
+    public function getBinaryContent();
+
+    /**
+     * Reset the binary content.
+     */
+    public function resetBinaryContent();
 
     /**
      * @param string $name
      * @param null   $default
      */
-    function getMetadataValue($name, $default = null);
+    public function getMetadataValue($name, $default = null);
 
     /**
      * @param string $name
      * @param mixed  $value
      */
-    function setMetadataValue($name, $value);
+    public function setMetadataValue($name, $value);
 
     /**
-     * Remove a named data from the metadata
+     * Remove a named data from the metadata.
      *
      * @param string $name
      */
-    function unsetMetadataValue($name);
+    public function unsetMetadataValue($name);
 
     /**
      * @return mixed
      */
-    function getId();
+    public function getId();
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      */
-    function setName($name);
+    public function setName($name);
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string $name
      */
-    function getName();
+    public function getName();
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
      */
-    function setDescription($description);
+    public function setDescription($description);
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string $description
      */
-    function getDescription();
+    public function getDescription();
 
     /**
-     * Set enabled
+     * Set enabled.
      *
-     * @param boolean $enabled
+     * @param bool $enabled
      */
-    function setEnabled($enabled);
+    public function setEnabled($enabled);
 
     /**
-     * Get enabled
+     * Get enabled.
      *
-     * @return boolean $enabled
+     * @return bool $enabled
      */
-    function getEnabled();
+    public function getEnabled();
 
     /**
-     * Set provider_name
+     * Set provider_name.
      *
      * @param string $providerName
      */
-    function setProviderName($providerName);
+    public function setProviderName($providerName);
 
     /**
-     * Get provider_name
+     * Get provider_name.
      *
      * @return string $providerName
      */
-    function getProviderName();
+    public function getProviderName();
 
     /**
-     * Set provider_status
+     * Set provider_status.
      *
-     * @param integer $providerStatus
+     * @param int $providerStatus
      */
-    function setProviderStatus($providerStatus);
+    public function setProviderStatus($providerStatus);
 
     /**
-     * Get provider_status
+     * Get provider_status.
      *
-     * @return integer $providerStatus
+     * @return int $providerStatus
      */
-    function getProviderStatus();
+    public function getProviderStatus();
 
     /**
-     * Set provider_reference
+     * Set provider_reference.
      *
      * @param string $providerReference
      */
-    function setProviderReference($providerReference);
+    public function setProviderReference($providerReference);
 
     /**
-     * Get provider_reference
+     * Get provider_reference.
      *
      * @return string $providerReference
      */
-    function getProviderReference();
+    public function getProviderReference();
 
     /**
-     * Set provider_metadata
+     * Set provider_metadata.
      *
      * @param array $providerMetadata
      */
-    function setProviderMetadata(array $providerMetadata = array());
+    public function setProviderMetadata(array $providerMetadata = array());
 
     /**
-     * Get provider_metadata
+     * Get provider_metadata.
      *
      * @return array $providerMetadata
      */
-    function getProviderMetadata();
+    public function getProviderMetadata();
 
     /**
-     * Set width
+     * Set width.
      *
-     * @param integer $width
+     * @param int $width
      */
-    function setWidth($width);
+    public function setWidth($width);
 
     /**
-     * Get width
+     * Get width.
      *
-     * @return integer $width
+     * @return int $width
      */
-    function getWidth();
+    public function getWidth();
 
     /**
-     * Set height
+     * Set height.
      *
-     * @param integer $height
+     * @param int $height
      */
-    function setHeight($height);
+    public function setHeight($height);
 
     /**
-     * Get height
+     * Get height.
      *
-     * @return integer $height
+     * @return int $height
      */
-    function getHeight();
+    public function getHeight();
 
     /**
-     * Set length
+     * Set length.
      *
      * @param float $length
      */
-    function setLength($length);
+    public function setLength($length);
 
     /**
-     * Get length
+     * Get length.
      *
      * @return float $length
      */
-    function getLength();
+    public function getLength();
 
     /**
-     * Set copyright
+     * Set copyright.
      *
      * @param string $copyright
      */
-    function setCopyright($copyright);
+    public function setCopyright($copyright);
 
     /**
-     * Get copyright
+     * Get copyright.
      *
      * @return string $copyright
      */
-    function getCopyright();
+    public function getCopyright();
 
     /**
-     * Set authorName
+     * Set authorName.
      *
      * @param string $authorName
      */
-    function setAuthorName($authorName);
+    public function setAuthorName($authorName);
 
     /**
-     * Get authorName
+     * Get authorName.
      *
      * @return string $authorName
      */
-    function getAuthorName();
+    public function getAuthorName();
 
     /**
-     * Set context
+     * Set context.
      *
      * @param string $context
      */
-    function setContext($context);
+    public function setContext($context);
 
     /**
-     * Get context
+     * Get context.
      *
      * @return string $context
      */
-    function getContext();
+    public function getContext();
 
     /**
-     * Set cdnIsFlushable
+     * Set cdnIsFlushable.
      *
-     * @param boolean $cdnIsFlushable
+     * @param bool $cdnIsFlushable
      */
-    function setCdnIsFlushable($cdnIsFlushable);
+    public function setCdnIsFlushable($cdnIsFlushable);
 
     /**
-     * Get cdn_is_flushable
+     * Get cdn_is_flushable.
      *
-     * @return boolean $cdnIsFlushable
+     * @return bool $cdnIsFlushable
      */
-    function getCdnIsFlushable();
+    public function getCdnIsFlushable();
 
     /**
-     * Set cdn_flush_at
+     * Set cdn_flush_identifier.
+     *
+     * @param bool $cdnFlushIdentifier
+     */
+    public function setCdnFlushIdentifier($cdnFlushIdentifier);
+
+    /**
+     * Get cdn_flush_identifier.
+     *
+     * @return string $cdnFlushIdentifier
+     */
+    public function getCdnFlushIdentifier();
+
+    /**
+     * Set cdn_flush_at.
      *
      * @param \Datetime $cdnFlushAt
      */
-    function setCdnFlushAt(\Datetime $cdnFlushAt = null);
+    public function setCdnFlushAt(\Datetime $cdnFlushAt = null);
 
     /**
-     * Get cdn_flush_at
+     * Get cdn_flush_at.
      *
      * @return \Datetime $cdnFlushAt
      */
-    function getCdnFlushAt();
+    public function getCdnFlushAt();
 
     /**
-     * Set updated_at
+     * Set updated_at.
      *
      * @param \Datetime $updatedAt
      */
-    function setUpdatedAt(\Datetime $updatedAt = null);
+    public function setUpdatedAt(\Datetime $updatedAt = null);
 
     /**
-     * Get updated_at
+     * Get updated_at.
      *
      * @return \Datetime $updatedAt
      */
-    function getUpdatedAt();
+    public function getUpdatedAt();
 
     /**
-     * Set created_at
+     * Set created_at.
      *
      * @param \Datetime $createdAt
      */
-    function setCreatedAt(\Datetime $createdAt = null);
+    public function setCreatedAt(\Datetime $createdAt = null);
 
     /**
-     * Get created_at
+     * Get created_at.
      *
      * @return \Datetime $createdAt
      */
-    function getCreatedAt();
+    public function getCreatedAt();
 
     /**
-     * Set content_type
+     * Set content_type.
      *
      * @param string $contentType
      */
-    function setContentType($contentType);
+    public function setContentType($contentType);
 
     /**
      * @return string
      */
-    function getExtension();
+    public function getExtension();
 
     /**
-     * Get content_type
+     * Get content_type.
      *
      * @return string $contentType
      */
-    function getContentType();
+    public function getContentType();
 
     /**
-     * Set size
+     * Set size.
      *
-     * @param integer $size
+     * @param int $size
      */
-    function setSize($size);
+    public function setSize($size);
 
     /**
-     * Get size
+     * Get size.
      *
-     * @return integer $size
+     * @return int $size
      */
-    function getSize();
+    public function getSize();
 
     /**
-     * Set cdn_status
+     * Set cdn_status.
      *
-     * @param integer $cdnStatus
+     * @param int $cdnStatus
      */
-    function setCdnStatus($cdnStatus);
+    public function setCdnStatus($cdnStatus);
 
     /**
+     * Get cdn_status.
      *
-     * Get cdn_status
-     *
-     * @return integer $cdnStatus
+     * @return int $cdnStatus
      */
-    function getCdnStatus();
+    public function getCdnStatus();
 
     /**
-     * @return \Imagine\Image\Box
+     * @return Box
      */
-    function getBox();
+    public function getBox();
 
     /**
-     * @return mixed
+     * @param GalleryHasMediaInterface[] $galleryHasMedias
      */
-    function __toString();
+    public function setGalleryHasMedias($galleryHasMedias);
 
     /**
-     * @param array $galleryHasMedias
-     *
-     * @return void
+     * @return GalleryHasMediaInterface[]
      */
-    function setGalleryHasMedias($galleryHasMedias);
-
-    /**
-     * @return array
-     */
-    function getGalleryHasMedias();
+    public function getGalleryHasMedias();
 
     /**
      * @return string
      */
-    function getPreviousProviderReference();
+    public function getPreviousProviderReference();
 }

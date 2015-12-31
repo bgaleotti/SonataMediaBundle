@@ -1,6 +1,7 @@
 <?php
+
 /*
- * This file is part of the Sonata project.
+ * This file is part of the Sonata Project package.
  *
  * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
  *
@@ -10,11 +11,12 @@
 
 namespace Sonata\MediaBundle\Provider;
 
-use Sonata\MediaBundle\Model\MediaInterface;
-use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\MediaBundle\Resizer\ResizerInterface;
 use Gaufrette\Filesystem;
-use Sonata\AdminBundle\Validator\ErrorElement;
+use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\CoreBundle\Model\MetadataInterface;
+use Sonata\CoreBundle\Validator\ErrorElement;
+use Sonata\MediaBundle\Model\MediaInterface;
+use Sonata\MediaBundle\Resizer\ResizerInterface;
 use Symfony\Component\Form\FormBuilder;
 
 interface MediaProviderInterface
@@ -22,255 +24,230 @@ interface MediaProviderInterface
     /**
      * @param string $name
      * @param array  $format
-     *
-     * @return void
      */
-    function addFormat($name, $format);
+    public function addFormat($name, $format);
 
     /**
-     * return the format settings
+     * return the format settings.
      *
      * @param string $name
      *
      * @return array|false the format settings
      */
-    function getFormat($name);
+    public function getFormat($name);
 
     /**
-     * return true if the media related to the provider required thumbnails (generation)
+     * return true if the media related to the provider required thumbnails (generation).
      *
-     * @return boolean
+     * @return bool
      */
-    function requireThumbnails();
+    public function requireThumbnails();
 
     /**
-     * Generated thumbnails linked to the media, a thumbnail is a format used on the website
+     * Generated thumbnails linked to the media, a thumbnail is a format used on the website.
      *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     *
-     * @return void
+     * @param MediaInterface $media
      */
-    function generateThumbnails(MediaInterface $media);
+    public function generateThumbnails(MediaInterface $media);
 
     /**
-     * remove all linked thumbnails
+     * remove linked thumbnails.
      *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     *
-     * @return void
+     * @param MediaInterface $media
+     * @param string|array   $formats
      */
-    function removeThumbnails(MediaInterface $media);
+    public function removeThumbnails(MediaInterface $media, $formats = null);
 
     /**
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
+     * @param MediaInterface $media
      *
      * @return \Gaufrette\File
      */
-    function getReferenceFile(MediaInterface $media);
+    public function getReferenceFile(MediaInterface $media);
 
     /**
-     * return the correct format name : providerName_format
+     * return the correct format name : providerName_format.
      *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     * @param string                                   $format
+     * @param MediaInterface $media
+     * @param string         $format
      *
      * @return string
      */
-    function getFormatName(MediaInterface $media, $format);
+    public function getFormatName(MediaInterface $media, $format);
 
     /**
-     * return the reference image of the media, can be the video thumbnail or the original uploaded picture
+     * return the reference image of the media, can be the video thumbnail or the original uploaded picture.
      *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
+     * @param MediaInterface $media
      *
      * @return string to the reference image
      */
-    function getReferenceImage(MediaInterface $media);
+    public function getReferenceImage(MediaInterface $media);
 
     /**
-     *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     *
-     * @return void
+     * @param MediaInterface $media
      */
-    function preUpdate(MediaInterface $media);
+    public function preUpdate(MediaInterface $media);
 
     /**
-     *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     *
-     * @return void
+     * @param MediaInterface $media
      */
-    function postUpdate(MediaInterface $media);
+    public function postUpdate(MediaInterface $media);
 
     /**
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     *
-     * @return void
+     * @param MediaInterface $media
      */
-    function preRemove(MediaInterface $media);
+    public function preRemove(MediaInterface $media);
 
     /**
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     *
-     * @return void
+     * @param MediaInterface $media
      */
-    function postRemove(MediaInterface $media);
+    public function postRemove(MediaInterface $media);
 
     /**
-     * build the related create form
+     * build the related create form.
      *
-     * @param \Sonata\AdminBundle\Form\FormMapper $formMapper
+     * @param FormMapper $formMapper
      */
-    function buildCreateForm(FormMapper $formMapper);
+    public function buildCreateForm(FormMapper $formMapper);
 
     /**
-     * build the related create form
+     * build the related create form.
      *
-     * @param \Sonata\AdminBundle\Form\FormMapper $formMapper
+     * @param FormMapper $formMapper
      */
-    function buildEditForm(FormMapper $formMapper);
+    public function buildEditForm(FormMapper $formMapper);
 
     /**
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     *
-     * @return void
+     * @param MediaInterface $media
      */
-    function prePersist(MediaInterface $media);
+    public function prePersist(MediaInterface $media);
 
     /**
-     *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     *
-     * @return void
+     * @param MediaInterface $media
      */
-    function postPersist(MediaInterface $media);
+    public function postPersist(MediaInterface $media);
 
     /**
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     * @param string                                   $format
+     * @param MediaInterface $media
+     * @param string         $format
+     * @param array          $options
      */
-    function getHelperProperties(MediaInterface $media, $format);
+    public function getHelperProperties(MediaInterface $media, $format, $options = array());
 
     /**
-     * Generate the media path
+     * Generate the media path.
      *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
+     * @param MediaInterface $media
      *
      * @return string
      */
-    function generatePath(MediaInterface $media);
+    public function generatePath(MediaInterface $media);
 
     /**
-     * Generate the public path
+     * Generate the public path.
      *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     * @param string                                   $format
+     * @param MediaInterface $media
+     * @param string         $format
      *
      * @return string
      */
-    function generatePublicUrl(MediaInterface $media, $format);
+    public function generatePublicUrl(MediaInterface $media, $format);
 
     /**
-     * Generate the private path
+     * Generate the private path.
      *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     * @param string                                   $format
+     * @param MediaInterface $media
+     * @param string         $format
      *
      * @return string
      */
-    function generatePrivateUrl(MediaInterface $media, $format);
+    public function generatePrivateUrl(MediaInterface $media, $format);
 
     /**
-     *
      * @return array
      */
-    function getFormats();
+    public function getFormats();
 
     /**
-     *
      * @param string $name
      */
-    function setName($name);
+    public function setName($name);
 
     /**
      * @return string
      */
-    function getName();
+    public function getName();
 
     /**
-     *
+     * @return MetadataInterface
+     */
+    public function getProviderMetadata();
+
+    /**
      * @param array $templates
      */
-    function setTemplates(array $templates);
+    public function setTemplates(array $templates);
 
     /**
-     *
-     * @return array
+     * @return string[]
      */
-    function getTemplates();
+    public function getTemplates();
 
     /**
      * @param string $name
      *
      * @return string
      */
-    function getTemplate($name);
+    public function getTemplate($name);
 
     /**
-     * Mode can be x-file
+     * Mode can be x-file.
      *
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     * @param string                                  $format
-     * @param string                                  $mode
+     * @param MediaInterface $media
+     * @param string         $format
+     * @param string         $mode
+     * @param array          $headers
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    function getDownloadResponse(MediaInterface $media, $format, $mode);
+    public function getDownloadResponse(MediaInterface $media, $format, $mode, array $headers = array());
 
     /**
-     * @return \Sonata\MediaBundle\Media\ResizerInterface
+     * @return ResizerInterface
      */
-    function getResizer();
+    public function getResizer();
 
     /**
-     * @return \Gaufrette\Filesystem
+     * @return Filesystem
      */
-    function getFilesystem();
+    public function getFilesystem();
 
     /**
      * @param string $relativePath
      * @param bool   $isFlushable
      */
-    function getCdnPath($relativePath, $isFlushable);
+    public function getCdnPath($relativePath, $isFlushable);
 
     /**
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     *
-     * @return void
+     * @param MediaInterface $media
      */
-    function transform(MediaInterface $media);
+    public function transform(MediaInterface $media);
 
     /**
-     * @param \Sonata\AdminBundle\Validator\ErrorElement $errorElement
-     * @param \Sonata\MediaBundle\Model\MediaInterface   $media
-     *
-     * @return void
+     * @param ErrorElement   $errorElement
+     * @param MediaInterface $media
      */
-    function validate(ErrorElement $errorElement, MediaInterface $media);
+    public function validate(ErrorElement $errorElement, MediaInterface $media);
 
     /**
-     * @param \Symfony\Component\Form\FormBuilder $formBuilder
-     *
-     * @return void
+     * @param FormBuilder $formBuilder
      */
-    function buildMediaType(FormBuilder $formBuilder);
+    public function buildMediaType(FormBuilder $formBuilder);
 
     /**
-     * @param \Sonata\MediaBundle\Model\MediaInterface $media
-     * @param bool                                     $force
-     *
-     * @return void
+     * @param MediaInterface $media
+     * @param bool           $force
      */
-    function updateMetadata(MediaInterface $media, $force = false);
+    public function updateMetadata(MediaInterface $media, $force = false);
 }
