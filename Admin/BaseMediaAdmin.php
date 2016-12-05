@@ -38,7 +38,7 @@ abstract class BaseMediaAdmin extends AbstractAdmin
      * @param Pool                     $pool
      * @param CategoryManagerInterface $categoryManager
      */
-    public function __construct($code, $class, $baseControllerName, Pool $pool, CategoryManagerInterface $categoryManager)
+    public function __construct($code, $class, $baseControllerName, Pool $pool, CategoryManagerInterface $categoryManager = null)
     {
         parent::__construct($code, $class, $baseControllerName);
 
@@ -84,15 +84,17 @@ abstract class BaseMediaAdmin extends AbstractAdmin
             $this->getRequest()->query->set('provider', $provider);
         }
 
-        $categoryId = $this->getRequest()->get('category');
+        if (null !== $this->categoryManager) {
+            $categoryId = $this->getRequest()->get('category');
+            if (!$categoryId) {
+                $categoryId = $this->categoryManager->getRootCategory($context)->getId();
+            }
 
-        if (!$categoryId) {
-            $categoryId = $this->categoryManager->getRootCategory($context)->getId();
+            $parameters['category'] = $categoryId;
         }
 
         return array_merge($parameters, array(
             'context' => $context,
-            'category' => $categoryId,
             'hide_context' => (bool) $this->getRequest()->get('hide_context'),
         ));
     }
