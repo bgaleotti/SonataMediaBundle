@@ -125,7 +125,7 @@ abstract class BaseMediaAdmin extends AbstractAdmin
 
             $media->setContext($context = $this->getRequest()->get('context'));
 
-            if ($categoryId = $this->getPersistentParameter('category')) {
+            if (null !== $this->categoryManager && $categoryId = $this->getPersistentParameter('category')) {
                 $category = $this->categoryManager->find($categoryId);
 
                 if ($category && $category->getContext()->getId() == $context) {
